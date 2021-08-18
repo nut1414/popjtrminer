@@ -3,14 +3,20 @@ import time
 import random
 import json
 
-KEY = "" # AC BC DS SK
-POPMIN = 300
-POPMAX = 500
+KEY = input("Enter Team (AC, BC, DS, SK): ") # AC BC DS SK
+POPPOWER = int(input("Input Your Pop Power (around 100-200): "))
+
+if POPPOWER > 300: # limit for the sanity of the owner?
+    POPPOWER = 300
+elif POPPOWER < 51:
+    POPPOWER = 51
+
+
+POPRANGE = 50
+POPMIN = POPPOWER-POPRANGE
+POPMAX = POPPOWER+POPRANGE
 DELAY = 1 # beware of rate limit
-
-
-
-keyindex = {"AC":0,"BC":1,"DS":2,"SK":3}.get(KEY)
+keyindex = {"AC":0,"BC":1,"DS":2,"SK":3}.get(KEY,0)
 urllb = "https://popjapi.deta.dev/leaderboards"
 
 while(True):
