@@ -12,7 +12,7 @@ KEY = str()
 while not KEY in ['AC','BC','DS','SK']:
     KEY = input("Enter Team (AC, BC, DS, SK): ")
 POPPOWER = int(input("Enter Your Pop Power (MAX 450): "))
-DELAY = float(input("Enter Your Delay (between 10-20): ")) # beware of rate limit
+DELAY = float(input("Enter Your Delay (Recommend: 30): ")) # beware of rate limit
 
 
 urllb = "https://api.pophq.net/leaderboards"
