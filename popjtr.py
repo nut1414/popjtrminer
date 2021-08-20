@@ -1,27 +1,11 @@
 import requests
 import time
 import json
-
+import math
 
 def fstrclock():
     return f'[{time.strftime("%H:%M:%S",time.gmtime())}]'
-
-
-print('It is recommended to close all instances of pophq.net before using this.\n')
-KEY = str()
-while not KEY in ['AC','BC','DS','SK']:
-    KEY = input("Enter Team (AC, BC, DS, SK): ")
-POPPOWER = int(input("Enter Your Pop Power (MAX 450): "))
-DELAY = float(input("Enter Your Delay (between 10-20): ")) # beware of rate limit
-
-
-urllb = "https://api.pophq.net/leaderboards"
-urltk = "https://api.pophq.net/token"
-
-
-
-token = ''
-if input("Would you like to manually enter token? (y/n) (n if not sure): ") != 'y':
+def gettoken():
     print(f'{fstrclock()} Getting Token...')
     try:
         token = requests.post(urltk)
@@ -39,6 +23,24 @@ if input("Would you like to manually enter token? (y/n) (n if not sure): ") != '
     tkfile = open('token.txt', 'a')
     tkfile.write(f"{fstrclock()} {token}\n")
     tkfile.close()
+
+
+print('It is recommended to close all instances of pophq.net before using this.\n')
+KEY = str()
+while not KEY in ['AC','BC','DS','SK']:
+    KEY = input("Enter Team (AC, BC, DS, SK): ")
+POPPOWER = int(input("Enter Your Pop Power (MAX 450): "))
+DELAY = float(input("Enter Your Delay (between 10-20): ")) # beware of rate limit
+
+
+urllb = "https://api.pophq.net/leaderboards"
+urltk = "https://api.pophq.net/token"
+
+
+
+token = ''
+if input("Would you like to manually enter token? (y/n) (n if not sure): ") != 'y':
+    gettoken()
 else:
     token = input("Enter a token: ")
     tkfile = open('token.txt', 'a')
@@ -52,6 +54,8 @@ except Exception as error:
     print(f'{fstrclock()} Error: {str(error)}')
 
 totalpop = 0
+errorbar = int(abs(20/math.log10(DELAY)))
+errorcount = 0 
 keyindex = {"AC":0,"BC":1,"DS":2,"SK":3}.get(KEY,0)
 
 if POPPOWER > 450: # 450 is set limit
@@ -68,6 +72,9 @@ while True:
     url = f"https://api.pophq.net/clicks?click={str(click)}&key={KEY}&token={token}"
     
     try:
+        if errorcount >= errorbar:
+            print(f'{fstrclock()} Token might be expired! Refreshing token...')
+            gettoken()
         res = requests.post(url)
         time.sleep(0.5)
 
@@ -77,15 +84,21 @@ while True:
             pointsadd = status.get('data', {'pointsAdded': 0}).get('pointsAdded')
             if success == True:
                 totalpop+=pointsadd
+                errorcount = 0
                 print(f'{fstrclock()} OK! CODE:{res.status_code}, POP: {pointsadd}, Your Total: {totalpop}, Team Total: {str(json.loads(reslb.text).get("data").get("teams")[keyindex].get("scores"))}')
             else:
                 print(f'{fstrclock()} FAIL! CODE:{res.status_code} Error: {status.get("type","unknown_error")}')
+                errorcount+=1
         elif res.status_code == 500:
             print(f'{fstrclock()} FAIL! CODE:{res.status_code} Internal Server Error')
+            errorcount+=1
         elif res.status_code == 422:
             print(f'{fstrclock()} FAIL! CODE:{res.status_code} Unprocessable Entity')
+            errorcount+=1
         else:
             print(f'{fstrclock()} FAIL! CODE:{res.status_code} {json.loads(res.text).get("error")}')
+            errorcount+=1
+        
         reslb = requests.get(urllb)
     except Exception as error:
         print(f'{fstrclock()} FAIL! Error: {str(error)}')
