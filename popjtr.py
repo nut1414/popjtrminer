@@ -77,7 +77,7 @@ while True:
             pointsadd = status.get('data', {'pointsAdded': 0}).get('pointsAdded')
             if success == True:
                 totalpop+=pointsadd
-                print(f'{fstrclock()} OK! CODE:{res.status_code}, POP: {click}, Your Total: {pointsadd}, Team Total: {str(json.loads(reslb.text).get("data").get("teams")[keyindex].get("scores"))}')
+                print(f'{fstrclock()} OK! CODE:{res.status_code}, POP: {pointsadd}, Your Total: {totalpop}, Team Total: {str(json.loads(reslb.text).get("data").get("teams")[keyindex].get("scores"))}')
             else:
                 print(f'{fstrclock()} FAIL! CODE:{res.status_code} Error: {status.get("type","unknown_error")}')
         elif res.status_code == 500:
