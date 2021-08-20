@@ -1,3 +1,3 @@
 # popjtrminer
 
-popjaturamitr.vercel.app popper
+popjaturamitr.vercel.app / pophq.net popper
