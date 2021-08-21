@@ -71,13 +71,16 @@ while True:
     try:
         res = sess.post(url)
         time.sleep(0.5)
+        reslb = sess.get(urllb)
         if res.status_code == 200:
             status = json.loads(res.text)
+            statuslb = json.loads(reslb.text)
             success = status.get('success', False)
             pointsadd = status.get('data', {'pointsAdded': 0}).get('pointsAdded')
+            teamtotal = statuslb.get("data").get("teams")[keyindex].get("scores")
             if success == True:
                 totalpop+=pointsadd
-                print(f'{fstrclock()} OK! CODE:{res.status_code}, POP: {pointsadd}, Your Total: {totalpop}, Team Total: {str(json.loads(reslb.text).get("data").get("teams")[keyindex].get("scores"))}')
+                print(f'{fstrclock()} OK! CODE:{res.status_code}, POP: {pointsadd}, Your Total: {totalpop}, Team Total: {str(teamtotal)}')
             else:
                 print(f'{fstrclock()} FAIL! CODE:{res.status_code} Error: {status.get("type","unknown_error")}')
         elif res.status_code == 500:
@@ -86,7 +89,6 @@ while True:
             print(f'{fstrclock()} FAIL! CODE:{res.status_code} Unprocessable Entity')
         else:
             print(f'{fstrclock()} FAIL! CODE:{res.status_code} {json.loads(res.text).get("error")}')
-        reslb = sess.get(urllb)
     except Exception as error:
         print(f'{fstrclock()} FAIL! Error: {str(error)}')
 
